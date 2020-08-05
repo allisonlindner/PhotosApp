@@ -13,7 +13,7 @@
 import UIKit
 
 @objc protocol PhotosRoutingLogic {
-	//func routeToSomewhere(segue: UIStoryboardSegue?)
+	func routeToFullPhoto(segue: UIStoryboardSegue?)
 }
 
 protocol PhotosDataPassing {
@@ -26,32 +26,17 @@ class PhotosRouter: NSObject, PhotosRoutingLogic, PhotosDataPassing {
 	
 	// MARK: Routing
 	
-	//func routeToSomewhere(segue: UIStoryboardSegue?)
-	//{
-	//  if let segue = segue {
-	//    let destinationVC = segue.destination as! SomewhereViewController
-	//    var destinationDS = destinationVC.router!.dataStore!
-	//    passDataToSomewhere(source: dataStore!, destination: &destinationDS)
-	//  } else {
-	//    let storyboard = UIStoryboard(name: "Main", bundle: nil)
-	//    let destinationVC = storyboard.instantiateViewController(withIdentifier: "SomewhereViewController") as! SomewhereViewController
-	//    var destinationDS = destinationVC.router!.dataStore!
-	//    passDataToSomewhere(source: dataStore!, destination: &destinationDS)
-	//    navigateToSomewhere(source: viewController!, destination: destinationVC)
-	//  }
-	//}
-	
-	// MARK: Navigation
-	
-	//func navigateToSomewhere(source: PhotosViewController, destination: SomewhereViewController)
-	//{
-	//  source.show(destination, sender: nil)
-	//}
+	func routeToFullPhoto(segue: UIStoryboardSegue?) {
+		if let segue = segue {
+			let destinationVC = segue.destination as! FullPhotoViewController
+			var destinationDS = destinationVC.router!.dataStore!
+			passDataToFullPhoto(source: dataStore!, destination: &destinationDS)
+		}
+	}
 	
 	// MARK: Passing data
 	
-	//func passDataToSomewhere(source: PhotosDataStore, destination: inout SomewhereDataStore)
-	//{
-	//  destination.name = source.name
-	//}
+	func passDataToFullPhoto(source: PhotosDataStore, destination: inout FullPhotoDataStore) {
+		destination.photoURL = source.photoURL
+	}
 }

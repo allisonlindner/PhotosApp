@@ -11,14 +11,23 @@
 //
 
 import UIKit
+import RealmSwift
 
 protocol PhotosDisplayLogic: class {
-	func displaySomething(viewModel: Photos.Something.ViewModel)
+	func displayPhotos(viewModel: Photos.Data.ViewModel)
+	func displayFullPhoto(viewModel: Photos.Full.ViewModel)
 }
 
 class PhotosViewController: UIViewController, PhotosDisplayLogic, UICollectionViewDelegate, UICollectionViewDataSource {
+	@IBOutlet weak var collectionView: UICollectionView!
+	
 	var interactor: PhotosBusinessLogic?
 	var router: (NSObjectProtocol & PhotosRoutingLogic & PhotosDataPassing)?
+	
+	var photosId: [Int:Int] = [:]
+	var images: [Int:UIImage] = [:]
+	
+	private var currentPage = 1
 	
 	// MARK: Object lifecycle
 	
@@ -62,29 +71,74 @@ class PhotosViewController: UIViewController, PhotosDisplayLogic, UICollectionVi
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		doSomething()
+		
+		collectionView.register(PhotoCollectionViewCell.self, forCellWithReuseIdentifier: "photoCell")
+		
+		collectionView.delegate = self
+		collectionView.dataSource = self
+		
+		fetch()
 	}
 	
 	// MARK: Do something
 	
 	//@IBOutlet weak var nameTextField: UITextField!
 	
-	func doSomething() {
-		let request = Photos.Something.Request()
-		interactor?.doSomething(request: request)
+	func fetch() {
+		let request = Photos.Data.Request(count: currentPage)
+		interactor?.getMorePhotos(request: request)
 	}
 	
-	func displaySomething(viewModel: Photos.Something.ViewModel) {
-		//nameTextField.text = viewModel.name
+	func displayPhotos(viewModel: Photos.Data.ViewModel) {
+		self.photosId = viewModel.photosId
+		self.images = viewModel.images
+		
+		DispatchQueue.main.async {
+			self.collectionView.reloadData()
+		}
+	}
+	
+	func displayFullPhoto(viewModel: Photos.Full.ViewModel) {
+		self.interactor?.setPhoto(url: viewModel.url)
+		self.performSegue(withIdentifier: "FullPhoto", sender: nil)
 	}
 	
 	// MARK: CollectionView
 	
 	func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-		return 0
+		return photosId.count
+	}
+	
+	func numberOfSections(in collectionView: UICollectionView) -> Int {
+		return 1
+	}
+	
+	func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+		if indexPath.row == photosId.count - 4 {
+			currentPage += 1
+			fetch()
+		}
+		
+		if let cell = cell as? PhotoCollectionViewCell {
+			if indexPath.row < images.count {
+				cell.setup(withImage: images[photosId[indexPath.row]!]!)
+			}
+		}
+	}
+	
+	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+		let request = Photos.Full.Request(id: photosId[indexPath.row]!)
+		self.interactor?.showFullPhoto(request: request)
 	}
 	
 	func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-		return UICollectionViewCell()
+		let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "photoCell", for: indexPath) as! PhotoCollectionViewCell
+		cell.prepareForReuse()
+		
+		if indexPath.row < images.count {
+			cell.setup(withImage: images[photosId[indexPath.row]!]!)
+		}
+		
+		return cell
 	}
 }

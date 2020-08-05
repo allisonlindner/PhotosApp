@@ -11,10 +11,75 @@
 //
 
 import UIKit
+import RealmSwift
 
-class SplashWorker
-{
-  func doSomeWork()
-  {
-  }
+class SplashWorker {
+	func fetchData(completion: @escaping () -> Void) {
+		let fetchWorker = FetchWorker()
+		
+		fetchWorker.fetchPhotos { (photos) in
+			let realm = try! Realm()
+			if LocalStorage.shared.getFirstAccess(realm: realm) {
+				self.updatePhotos(photos)
+			} else {
+				DispatchQueue.global(qos: .background).async {
+					autoreleasepool {
+						self.updatePhotos(photos)
+					}
+				}
+			}
+			
+			fetchWorker.fetchAlbums { (albums) in
+			let realm = try! Realm()
+				if LocalStorage.shared.getFirstAccess(realm: realm) {
+					self.updateAlbuns(albums)
+				} else {
+					DispatchQueue.global(qos: .background).async {
+						autoreleasepool {
+							self.updateAlbuns(albums)
+						}
+					}
+				}
+				
+				LocalStorage.shared.setNotFirstAccess()
+				completion()
+			}
+		}
+	}
+	
+	private func updatePhotos(_ photos: [PhotoDTO]) {
+		let realm = try! Realm()
+		realm.beginWrite()
+		
+		for i in 0..<photos.count {
+			let localPhoto = LocalPhoto()
+			
+			localPhoto.albumId.value = photos[i].albumId
+			localPhoto.id = photos[i].id!
+			localPhoto.title = photos[i].title
+			localPhoto.url = photos[i].url
+			localPhoto.thumbnailUrl = photos[i].thumbnailUrl
+			
+			realm.add(localPhoto, update: .modified)
+		}
+		
+		try! realm.commitWrite()
+	}
+	
+	private func updateAlbuns(_ albums: [AlbumDTO]) {
+		let realm = try! Realm()
+		realm.beginWrite()
+		
+		for i in 0..<albums.count {
+			let localAlbum = LocalAlbum()
+			
+			localAlbum.userId.value = albums[i].userId
+			localAlbum.id = albums[i].id!
+			localAlbum.title = albums[i].title
+			
+			realm.add(localAlbum, update: .modified)
+		}
+		
+		try! realm.commitWrite()
+	}
 }

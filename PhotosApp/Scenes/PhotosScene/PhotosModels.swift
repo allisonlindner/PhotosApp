@@ -15,12 +15,29 @@ import UIKit
 enum Photos {
 	// MARK: Use cases
 	
-	enum Something {
+	enum Data {
 		struct Request {
+			var count: Int
 		}
 		struct Response {
+			var photosId: [Int:Int]
+			var images: [Int:UIImage]
 		}
 		struct ViewModel {
+			var photosId: [Int:Int]
+			var images: [Int:UIImage]
+		}
+	}
+	
+	enum Full {
+		struct Request {
+			var id: Int
+		}
+		struct Response {
+			var url: String
+		}
+		struct ViewModel {
+			var url: String
 		}
 	}
 }

@@ -11,27 +11,66 @@
 //
 
 import UIKit
+import RealmSwift
 
 protocol PhotosBusinessLogic {
-	func doSomething(request: Photos.Something.Request)
+	func getMorePhotos(request: Photos.Data.Request)
+	func showFullPhoto(request: Photos.Full.Request)
+	func setPhoto(url: String)
 }
 
 protocol PhotosDataStore {
-	//var name: String { get set }
+	var photoURL: String { get set }
 }
 
 class PhotosInteractor: PhotosBusinessLogic, PhotosDataStore {
 	var presenter: PhotosPresentationLogic?
 	var worker: PhotosWorker?
-	//var name: String = ""
+	var photosId = [Int:Int]()
+	var images = [Int:UIImage]()
+	var photoURL: String = ""
 	
 	// MARK: Do something
 	
-	func doSomething(request: Photos.Something.Request) {
-		worker = PhotosWorker()
-		worker?.doSomeWork()
+	func setPhoto(url: String) {
+		self.photoURL = url
+	}
+	
+	func getMorePhotos(request: Photos.Data.Request) {
+		DispatchQueue.global(qos: .background).async {
+			autoreleasepool {
+				let realm = try! Realm()
+				let	photos = LocalStorage.shared.getAllPhotos(realm: realm)
+				
+				for i in 0..<request.count * 26 {
+					if i >= self.images.count {
+						let url = URL(string: photos[i].thumbnailUrl!)!
+						let data = try! Data(contentsOf: url)
+						let image = UIImage(data : data)!
+						
+						self.images.updateValue(image, forKey: photos[i].id)
+						self.photosId.updateValue(photos[i].id, forKey: i)
+					}
+				}
+				
+				var maxRange = request.count * 26
+				
+				if maxRange > photos.count - 1 {
+					maxRange = photos.count
+				}
+				
+				let response = Photos.Data.Response(photosId: self.photosId, images: self.images)
+				self.presenter?.presentPhotos(response: response)
+			}
+		}
+	}
+	
+	func showFullPhoto(request: Photos.Full.Request) {
+		let realm = try! Realm()
 		
-		let response = Photos.Something.Response()
-		presenter?.presentSomething(response: response)
+		let photo = LocalStorage.shared.getPhoto(withId: request.id, realm: realm)
+		
+		let response = Photos.Full.Response(url: photo?.url ?? "")
+		self.presenter?.presentFullPhoto(response: response)
 	}
 }

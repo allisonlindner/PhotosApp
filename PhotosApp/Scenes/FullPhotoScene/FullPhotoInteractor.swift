@@ -12,30 +12,28 @@
 
 import UIKit
 
-protocol FullPhotoBusinessLogic
-{
-  func doSomething(request: FullPhoto.Something.Request)
+protocol FullPhotoBusinessLogic {
+	func loadImage(request: FullPhoto.Image.Request)
 }
 
-protocol FullPhotoDataStore
-{
-  //var name: String { get set }
+protocol FullPhotoDataStore {
+	var photoURL: String { get set }
 }
 
-class FullPhotoInteractor: FullPhotoBusinessLogic, FullPhotoDataStore
-{
-  var presenter: FullPhotoPresentationLogic?
-  var worker: FullPhotoWorker?
-  //var name: String = ""
-  
-  // MARK: Do something
-  
-  func doSomething(request: FullPhoto.Something.Request)
-  {
-    worker = FullPhotoWorker()
-    worker?.doSomeWork()
-    
-    let response = FullPhoto.Something.Response()
-    presenter?.presentSomething(response: response)
-  }
+class FullPhotoInteractor: FullPhotoBusinessLogic, FullPhotoDataStore {
+	var presenter: FullPhotoPresentationLogic?
+	var worker: FullPhotoWorker?
+	var photoURL: String = ""
+	
+	// MARK: Do something
+	
+	func loadImage(request: FullPhoto.Image.Request) {
+		if let url = URL(string: self.photoURL) {
+			let data = try! Data(contentsOf: url)
+			let image = UIImage(data : data)!
+			
+			let response = FullPhoto.Image.Response(image: image)
+			presenter?.presentImage(response: response)
+		}
+	}
 }

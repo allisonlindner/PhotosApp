@@ -12,78 +12,71 @@
 
 import UIKit
 
-protocol FullPhotoDisplayLogic: class
-{
-  func displaySomething(viewModel: FullPhoto.Something.ViewModel)
+protocol FullPhotoDisplayLogic: class {
+	func displayImage(viewModel: FullPhoto.Image.ViewModel)
 }
 
-class FullPhotoViewController: UIViewController, FullPhotoDisplayLogic
-{
-  var interactor: FullPhotoBusinessLogic?
-  var router: (NSObjectProtocol & FullPhotoRoutingLogic & FullPhotoDataPassing)?
-
-  // MARK: Object lifecycle
-  
-  override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?)
-  {
-    super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    setup()
-  }
-  
-  required init?(coder aDecoder: NSCoder)
-  {
-    super.init(coder: aDecoder)
-    setup()
-  }
-  
-  // MARK: Setup
-  
-  private func setup()
-  {
-    let viewController = self
-    let interactor = FullPhotoInteractor()
-    let presenter = FullPhotoPresenter()
-    let router = FullPhotoRouter()
-    viewController.interactor = interactor
-    viewController.router = router
-    interactor.presenter = presenter
-    presenter.viewController = viewController
-    router.viewController = viewController
-    router.dataStore = interactor
-  }
-  
-  // MARK: Routing
-  
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?)
-  {
-    if let scene = segue.identifier {
-      let selector = NSSelectorFromString("routeTo\(scene)WithSegue:")
-      if let router = router, router.responds(to: selector) {
-        router.perform(selector, with: segue)
-      }
-    }
-  }
-  
-  // MARK: View lifecycle
-  
-  override func viewDidLoad()
-  {
-    super.viewDidLoad()
-    doSomething()
-  }
-  
-  // MARK: Do something
-  
-  //@IBOutlet weak var nameTextField: UITextField!
-  
-  func doSomething()
-  {
-    let request = FullPhoto.Something.Request()
-    interactor?.doSomething(request: request)
-  }
-  
-  func displaySomething(viewModel: FullPhoto.Something.ViewModel)
-  {
-    //nameTextField.text = viewModel.name
-  }
+class FullPhotoViewController: UIViewController, FullPhotoDisplayLogic {
+	@IBOutlet weak var imageView: UIImageView!
+	
+	var interactor: FullPhotoBusinessLogic?
+	var router: (NSObjectProtocol & FullPhotoRoutingLogic & FullPhotoDataPassing)?
+	
+	// MARK: Object lifecycle
+	
+	override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+		super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+		setup()
+	}
+	
+	required init?(coder aDecoder: NSCoder) {
+		super.init(coder: aDecoder)
+		setup()
+	}
+	
+	// MARK: Setup
+	
+	private func setup() {
+		let viewController = self
+		let interactor = FullPhotoInteractor()
+		let presenter = FullPhotoPresenter()
+		let router = FullPhotoRouter()
+		viewController.interactor = interactor
+		viewController.router = router
+		interactor.presenter = presenter
+		presenter.viewController = viewController
+		router.viewController = viewController
+		router.dataStore = interactor
+	}
+	
+	// MARK: Routing
+	
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+		if let scene = segue.identifier {
+			let selector = NSSelectorFromString("routeTo\(scene)WithSegue:")
+			if let router = router, router.responds(to: selector) {
+				router.perform(selector, with: segue)
+			}
+		}
+	}
+	
+	// MARK: View lifecycle
+	
+	override func viewDidLoad() {
+		super.viewDidLoad()
+		loadImage()
+	}
+	
+	// MARK: Do something
+	
+	//@IBOutlet weak var nameTextField: UITextField!
+	
+	func loadImage() {
+		let request = FullPhoto.Image.Request()
+		interactor?.loadImage(request: request)
+	}
+	
+	func displayImage(viewModel: FullPhoto.Image.ViewModel) {
+		self.imageView.image = viewModel.image
+	}
 }

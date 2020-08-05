@@ -12,20 +12,17 @@
 
 import UIKit
 
-enum FullPhoto
-{
-  // MARK: Use cases
-  
-  enum Something
-  {
-    struct Request
-    {
-    }
-    struct Response
-    {
-    }
-    struct ViewModel
-    {
-    }
-  }
+enum FullPhoto {
+	// MARK: Use cases
+	
+	enum Image {
+		struct Request {
+		}
+		struct Response {
+			var image: UIImage
+		}
+		struct ViewModel {
+			var image: UIImage
+		}
+	}
 }

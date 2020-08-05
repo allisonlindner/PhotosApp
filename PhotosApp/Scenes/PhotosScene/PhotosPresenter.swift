@@ -13,16 +13,22 @@
 import UIKit
 
 protocol PhotosPresentationLogic {
-	func presentSomething(response: Photos.Something.Response)
+	func presentPhotos(response: Photos.Data.Response)
+	func presentFullPhoto(response: Photos.Full.Response)
 }
 
 class PhotosPresenter: PhotosPresentationLogic {
-	weak var viewController: PhotosDisplayLogic?
+	var viewController: PhotosDisplayLogic?
 	
 	// MARK: Do something
 	
-	func presentSomething(response: Photos.Something.Response) {
-		let viewModel = Photos.Something.ViewModel()
-		viewController?.displaySomething(viewModel: viewModel)
+	func presentPhotos(response: Photos.Data.Response) {
+		let viewModel = Photos.Data.ViewModel(photosId: response.photosId, images: response.images)
+		viewController?.displayPhotos(viewModel: viewModel)
+	}
+	
+	func presentFullPhoto(response: Photos.Full.Response) {
+		let viewModel = Photos.Full.ViewModel(url: response.url)
+		viewController?.displayFullPhoto(viewModel: viewModel)
 	}
 }

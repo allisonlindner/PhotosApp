@@ -12,20 +12,17 @@
 
 import UIKit
 
-protocol FullPhotoPresentationLogic
-{
-  func presentSomething(response: FullPhoto.Something.Response)
+protocol FullPhotoPresentationLogic {
+	func presentImage(response: FullPhoto.Image.Response)
 }
 
-class FullPhotoPresenter: FullPhotoPresentationLogic
-{
-  weak var viewController: FullPhotoDisplayLogic?
-  
-  // MARK: Do something
-  
-  func presentSomething(response: FullPhoto.Something.Response)
-  {
-    let viewModel = FullPhoto.Something.ViewModel()
-    viewController?.displaySomething(viewModel: viewModel)
-  }
+class FullPhotoPresenter: FullPhotoPresentationLogic {
+	weak var viewController: FullPhotoDisplayLogic?
+	
+	// MARK: Do something
+	
+	func presentImage(response: FullPhoto.Image.Response) {
+		let viewModel = FullPhoto.Image.ViewModel(image: response.image)
+		viewController?.displayImage(viewModel: viewModel)
+	}
 }

@@ -12,20 +12,17 @@
 
 import UIKit
 
-enum Splash
-{
-  // MARK: Use cases
-  
-  enum Something
-  {
-    struct Request
-    {
-    }
-    struct Response
-    {
-    }
-    struct ViewModel
-    {
-    }
-  }
+enum Splash {
+	// MARK: Use cases
+	
+	enum Fetch {
+		struct Request {
+		}
+		struct Response {
+			var result: Bool
+		}
+		struct ViewModel {
+			var result: Bool
+		}
+	}
 }

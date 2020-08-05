@@ -12,9 +12,7 @@
 
 import UIKit
 
-class FullPhotoWorker
-{
-  func doSomeWork()
-  {
-  }
+class FullPhotoWorker {
+	func doSomeWork() {
+	}
 }

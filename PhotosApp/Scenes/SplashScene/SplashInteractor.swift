@@ -12,30 +12,26 @@
 
 import UIKit
 
-protocol SplashBusinessLogic
-{
-  func doSomething(request: Splash.Something.Request)
+protocol SplashBusinessLogic {
+	func fetchData(request: Splash.Fetch.Request)
 }
 
-protocol SplashDataStore
-{
-  //var name: String { get set }
+protocol SplashDataStore {
+	//var name: String { get set }
 }
 
-class SplashInteractor: SplashBusinessLogic, SplashDataStore
-{
-  var presenter: SplashPresentationLogic?
-  var worker: SplashWorker?
-  //var name: String = ""
-  
-  // MARK: Do something
-  
-  func doSomething(request: Splash.Something.Request)
-  {
-    worker = SplashWorker()
-    worker?.doSomeWork()
-    
-    let response = Splash.Something.Response()
-    presenter?.presentSomething(response: response)
-  }
+class SplashInteractor: SplashBusinessLogic, SplashDataStore {
+	var presenter: SplashPresentationLogic?
+	var worker: SplashWorker?
+	//var name: String = ""
+	
+	// MARK: Do something
+	
+	func fetchData(request: Splash.Fetch.Request) {
+		worker = SplashWorker()
+		worker?.fetchData() {
+			let response = Splash.Fetch.Response(result: false)
+			self.presenter?.presentFetchDataResult(response: response)
+		}
+	}
 }

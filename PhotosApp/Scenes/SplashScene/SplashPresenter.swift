@@ -12,20 +12,17 @@
 
 import UIKit
 
-protocol SplashPresentationLogic
-{
-  func presentSomething(response: Splash.Something.Response)
+protocol SplashPresentationLogic {
+	func presentFetchDataResult(response: Splash.Fetch.Response)
 }
 
-class SplashPresenter: SplashPresentationLogic
-{
-  weak var viewController: SplashDisplayLogic?
-  
-  // MARK: Do something
-  
-  func presentSomething(response: Splash.Something.Response)
-  {
-    let viewModel = Splash.Something.ViewModel()
-    viewController?.displaySomething(viewModel: viewModel)
-  }
+class SplashPresenter: SplashPresentationLogic {
+	weak var viewController: SplashDisplayLogic?
+	
+	// MARK: Do something
+	
+	func presentFetchDataResult(response: Splash.Fetch.Response) {
+		let viewModel = Splash.Fetch.ViewModel(result: false)
+		viewController?.displayFetchDataResult(viewModel: viewModel)
+	}
 }
